@@ -1,0 +1,571 @@
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spMatchupEntries_GetByMatchup]
+@MatchupId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	select*
+	from MatchupEntries
+	where MatchupId = @MatchupId;
+
+END
+GO
+
+
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE  [dbo].[spMatchupEntries_Insert]
+	@MatchupId int,
+	@ParentMatchupId int,
+	@TeamCompetingId int,
+	@id int = 0 output
+	
+	
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+    insert into dbo.MatchupEntries(MatchupId, ParentMatchupId, TeamCompetingId)
+	values (@MatchupId, @ParentMatchupId, @TeamCompetingId);
+
+	select @id = SCOPE_IDENTITY();
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spMatchupEntries_Update]
+
+	@id	int,
+	@TeamCompetingId int = null,
+	@Score float = null
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	update dbo.MatchupEntries
+	set TeamCompetingId = @TeamCompetingId, Score = @Score
+	where id = @id
+
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spMatchups_GetByTournament]
+	@TournamentId int
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+select m.*
+from dbo.Matchups m
+
+where m.TournamentId = @TournamentId
+order by MatchupRound;
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spMatchups_Insert]
+	@TournamentId int,
+	@MatchupRound int,
+	@id int = 0 output
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	insert into dbo.Matchups(TournamentId, MatchupRound)
+	values (@TournamentId, @MatchupRound);
+
+	select @id = SCOPE_IDENTITY();
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spMatchups_Update]
+@id int,
+@WinnerId int
+
+
+
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+	update dbo.Matchups
+	set WinnerId = @WinnerId 
+	where id = @id;
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[spPeople_GetAll]
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT People.id,
+			[People].[FirstName], 
+			[People].[LastName], 
+			[People].[EmailAddress], 
+			[People].[CellphoneNumber]
+	FROM	[dbo].[People];
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spPeople_GetByLastName]
+	@LastName nvarchar(100)
+
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+
+
+	select * 
+	from dbo.People
+	where LastName = @LastName;
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spPeople_Insert] 
+	@FirstName nvarchar(100),
+	@LastName nvarchar(100),
+	@EmailAddress nvarchar(100),
+	@CellPhoneNumber varchar(20),
+	@id int = 0 output
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	insert into dbo.People(FirstName, LastName, EmailAddress, CellPhoneNumber)
+	values (@FirstName, @LastName, @EmailAddress, @CellPhoneNumber)
+
+	select @id=SCOPE_IDENTITY();
+
+		
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spPrizes_GetByTournament] 
+	@TournamentId int
+
+AS
+BEGIN
+	
+	SET NOCOUNT ON;
+	
+select p.* 
+from dbo.Prizes p
+inner join dbo.TournamentPrizes t on p.id = t.PrizeId
+where t.TournamentId = @TournamentId;
+
+   
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spPrizes_Insert]
+	@PlaceNumber int,
+	@PlaceName NvarChar(50),
+	@PrizeAmount money,
+	@PrizePercentage float,
+	@id int = 0 output
+	
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+   insert into dbo.Prizes(PlaceNumber, PlaceName, PrizeAmount, PrizePercentage) 
+   values (@PlaceNumber, @PlaceName, @PrizeAmount, @PrizePercentage);
+
+  select @id =  SCOPE_IDENTITY(); 
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTeam_GetByTournament]
+@TournamentId int
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+select t.*
+from dbo.Teams t
+inner join dbo.TournamentEntries e on t.id = e.TeamId
+where e.TournamentId = @TournamentId;
+
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTeamMembers_GetByTeam]
+@TeamId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+select p.*
+from dbo.TeamMembers m
+inner join dbo.People p on m.PersonId = p.id
+where m.TeamId = @TeamId;
+
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTeamMembers_Insert]
+	@TeamId int,
+	@PersonId int,
+	@id int = 0 output
+	
+AS
+BEGIN
+	
+	SET NOCOUNT ON;
+
+   insert into dbo.TeamMembers(TeamID, PersonID)
+   values (@TeamID, @PersonID);
+
+   select @id = SCOPE_IDENTITY();
+
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTeams_GetAll]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	select * 
+	from dbo.Teams;
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTeams_Insert]
+	@TeamName nvarchar(50),
+	@id int = 0 output
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+    insert into dbo.Teams(TeamName)
+	values (@TeamName);
+
+	select @id = SCOPE_IDENTITY();
+
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTournament_Insert]
+@TournamentName nvarchar(200),
+@EntryFee money,
+@id int = 0 output
+
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	insert into dbo.Tournaments(TournamentName, EntryFee, Active)
+	values (@TournamentName, @EntryFee, 1);
+
+	select @id = SCOPE_IDENTITY();
+END
+GO
+
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTournamentEntries_Insert]
+	@TournamentId int,
+	@TeamId int,
+	@id int = 0 output
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+    insert into dbo.TournamentEntries(TournamentId, TeamId)
+	values(@TournamentId, @TeamId);
+
+	select @id = SCOPE_IDENTITY();
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[spTournamentPrizes_Insert]
+@TournamentId int,
+@PrizeId int,
+@id int = 0 output
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+  
+	insert into dbo.TournamentPrizes(TournamentId, PrizeId)
+	values (@TournamentId, @PrizeId);
+
+	select @id = SCOPE_IDENTITY();
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTournaments_Complete]
+	@id int
+
+
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	update dbo.Tournaments
+	set Active = 0
+	where id = @id;
+	 
+END
+GO
+
+USE [Tournaments]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[spTournaments_GetAll]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+select *
+from dbo.Tournaments
+where Active = 1;
+
+END
+GO
