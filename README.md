@@ -1,31 +1,29 @@
 # TrackerUI1
 
-///////////////
+
 Purpose in creating this program:
 I created this program in order to develop my programming skills. Building this program from the ground up helped me learn the entire program design process
 of creating an application in C#. An additional skill that I had to learn in order to complete the project is usuing SQL to create and store data properly in
 a database. 
 
 This program was created using Tim Corey's free Youtube course "Create a C# Application from Start to Finish - Complete Course".
-///////////////
 
-///////////////
+
 Big Picture Design:
 Structure: Windows Forms application and Class Library
 Data: SQL and/or Text File
 Users: One at a time on one application
-///////////////
 
-///////////////
+
 Key Concepts:
 -SQL (data tables, stored procedures)
 -Custom events
 -Error Handling
 -Interfaces
 -Random Ordering
-///////////////
 
-///////////////
+
+
 To run the program: 
 The program boots from Visual Studio, first opening the Tournament Dashboard. Here you can load an existing tournament or create a new one. You will need to
 enter the players names, team names, as well as some other information to create a tournament. Once a tournament is created, you can score it, which will 
@@ -38,9 +36,7 @@ changing the following found in program.cs:
 TrackerLibrary.GlobalConfig.InitializeConnection(DatabaseType.Sql); 
 to the following: 
 TrackerLibrary.GlobalConfig.InitializeConnection(DatabaseType.Txt);
-///////////////
 
-///////////////
 Mapping Data
 
 Team
@@ -79,4 +75,4 @@ MatchupEntry
 -TeamCompeting(Team)
 -Score(double)
 -ParentMatchup(Matchup)
-///////////////
+
